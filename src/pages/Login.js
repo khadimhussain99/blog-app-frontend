@@ -19,7 +19,7 @@ const Login = () => {
     setLoading(true);
     try {
       const { data } = await loginUser(form);
-      login(data.user, data.token);
+      login(data.user, data.accessToken, data.refreshToken);
       navigate('/dashboard');
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed');

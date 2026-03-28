@@ -14,14 +14,12 @@ const Register = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
-
     e.preventDefault();
     setError('');
     setLoading(true);
-    debugger
     try {
       const { data } = await registerUser(form);
-      login(data.user, data.token);
+      login(data.user, data.accessToken, data.refreshToken);
       navigate('/dashboard');
     } catch (err) {
       setError(err.response?.data?.message || 'Registration failed');
@@ -63,7 +61,6 @@ const Register = () => {
             onChange={handleChange}
             required
           />
-          {/* Role selector — demonstrates role-based access */}
           <select
             style={styles.input}
             name="role"

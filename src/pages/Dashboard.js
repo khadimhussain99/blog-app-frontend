@@ -1,11 +1,19 @@
 import { Link } from 'react-router-dom';
+import { useState } from 'react';
 import useAuth from '../hooks/useAuth';
 import usePosts from '../hooks/usePosts';
 import Spinner from '../components/Spinner';
 
 const Dashboard = () => {
   const { user } = useAuth();
-  const { posts, loading, error, deletePost } = usePosts();
+  const [statusFilter, setStatusFilter] = useState('all');
+  const { posts, loading, error, fetchPosts, deletePost } = usePosts();
+
+  const handleStatusFilter = (status) => {
+    setStatusFilter(status);
+    const filters = status === 'all' ? {} : { status };
+    fetchPosts(filters);
+  };
 
   const handleDelete = async (id) => {
     if (window.confirm('Delete this post?')) {
@@ -26,6 +34,40 @@ const Dashboard = () => {
           </p>
         </div>
         <Link to="/posts/new" style={styles.newBtn}>+ New Post</Link>
+      </div>
+
+      {/* Status Filter */}
+      <div style={styles.filterContainer}>
+        <label style={styles.filterLabel}>Filter by status:</label>
+        <div style={styles.filterButtons}>
+          <button
+            onClick={() => handleStatusFilter('all')}
+            style={{
+              ...styles.filterBtn,
+              ...(statusFilter === 'all' ? styles.filterBtnActive : {}),
+            }}
+          >
+            All
+          </button>
+          <button
+            onClick={() => handleStatusFilter('draft')}
+            style={{
+              ...styles.filterBtn,
+              ...(statusFilter === 'draft' ? styles.filterBtnActive : {}),
+            }}
+          >
+            Draft
+          </button>
+          <button
+            onClick={() => handleStatusFilter('published')}
+            style={{
+              ...styles.filterBtn,
+              ...(statusFilter === 'published' ? styles.filterBtnActive : {}),
+            }}
+          >
+            Published
+          </button>
+        </div>
       </div>
 
       {error && <p style={styles.error}>{error}</p>}
@@ -90,6 +132,11 @@ const styles = {
   subtitle: { color: '#666', marginTop: '4px' },
   role: { color: '#e94560', fontWeight: 600, textTransform: 'uppercase', fontSize: '13px' },
   newBtn: { background: '#e94560', color: '#fff', padding: '10px 20px', borderRadius: '8px', textDecoration: 'none', fontWeight: 600 },
+  filterContainer: { display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' },
+  filterLabel: { fontSize: '14px', fontWeight: 600, color: '#666' },
+  filterButtons: { display: 'flex', gap: '8px' },
+  filterBtn: { padding: '8px 16px', border: '1px solid #ddd', background: '#fff', borderRadius: '6px', cursor: 'pointer', fontSize: '14px', transition: 'all 0.2s' },
+  filterBtnActive: { background: '#e94560', color: '#fff', borderColor: '#e94560' },
   error: { background: '#fff0f0', color: '#e94560', padding: '10px', borderRadius: '6px', marginBottom: '16px' },
   empty: { textAlign: 'center', padding: '60px', background: '#fff', borderRadius: '12px' },
   table: { background: '#fff', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 2px 10px rgba(0,0,0,0.06)' },
